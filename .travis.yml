@@ -1,0 +1,7 @@
+language: go
+go:
+    - 1.6
+    - tip
+go_import_path: github.com/exekias/metric-collector
+install:
+    - go get -v ./...
