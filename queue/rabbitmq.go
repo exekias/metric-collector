@@ -123,6 +123,7 @@ func (c *RabbitMQChannel) ConsumeMetrics(queue string) (<-chan MetricMessage, er
 		for d := range msgs {
 			res <- &RabbitMQMetricMessage{d: d}
 		}
+		close(res)
 	}()
 
 	return res, nil

@@ -48,11 +48,11 @@ func main() {
 	}
 
 	// Init processor
-	log.Info("Initializing metric '%s' processor", flag.Arg(0))
+	log.Info(fmt.Sprintf("Initializing metric '%s' processor", flag.Arg(0)))
 	processor, queue := initProcessor(flag.Arg(0))
 
 	// Init queue consumer
-	log.Info("Initializing queue consumer", flag.Arg(0))
+	log.Info(fmt.Sprintf("Initializing queue consumer %s", flag.Arg(0)))
 	channel := initConsumer()
 
 	log.Info("Starting worker")
