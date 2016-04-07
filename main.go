@@ -95,12 +95,12 @@ func initConsumer() queue.Channel {
 	}
 
 	// Init queues
-	log.Debug("Declaring exchange '%s'", constants.Exchange)
+	log.Debug(fmt.Sprintf("Declaring exchange '%s'", constants.Exchange))
 	if err = ch.DeclareExchange(constants.Exchange, true); err != nil {
 		log.Fatal("Could not declare queue exchange: ", err)
 	}
 	for _, queue := range constants.Queues {
-		log.Debug("Declaring queue '%s'", queue)
+		log.Debug(fmt.Sprintf("Declaring queue '%s'", queue))
 		if err = ch.DeclareQueue(constants.Exchange, queue, true); err != nil {
 			log.Fatal("Could not declare queue: ", err)
 		}

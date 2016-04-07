@@ -3,6 +3,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -24,12 +26,18 @@ const (
 )
 
 var log = logging.MustGetLogger("dispatcher")
+var debug = flag.Bool("debug", false, "Enable debug")
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
 func main() {
+	flag.Parse()
+	if *debug {
+		logging.SetLevel(logging.DEBUG, "")
+	}
+
 	var ch queue.Channel
 
 	// Connect to RabbitMQ
@@ -40,12 +48,12 @@ func main() {
 	}
 
 	// Init queues
-	log.Debug("Declaring exchange '%s'", constants.Exchange)
+	log.Debug(fmt.Sprintf("Declaring exchange '%s'", constants.Exchange))
 	if err := ch.DeclareExchange(constants.Exchange, true); err != nil {
 		log.Fatal("Could not declare queue exchange: ", err)
 	}
 	for _, queue := range constants.Queues {
-		log.Debug("Declaring queue '%s'", queue)
+		log.Debug(fmt.Sprintf("Declaring queue '%s'", queue))
 		if err := ch.DeclareQueue(constants.Exchange, queue, true); err != nil {
 			log.Fatal("Could not declare queue: ", err)
 		}

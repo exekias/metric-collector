@@ -25,7 +25,7 @@ func RunWorker(channel queue.Channel, q string, processor MetricDataProcessor) {
 			if err != nil {
 				log.Error("Unexpected error reading metric data:", err)
 			}
-			log.Debug("Processing metric: %#v", data)
+			log.Debug("Processing metric", data)
 			if err := processor.Process(data); err == nil {
 				// We are done
 				m.Ack()

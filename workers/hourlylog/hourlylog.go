@@ -1,6 +1,7 @@
 package hourlylog
 
 import (
+	"fmt"
 	"time"
 
 	"gopkg.in/mgo.v2"
@@ -25,7 +26,7 @@ type mongoMetric struct {
 
 // NewHourlyLog intializes and returns a new hourly log processor
 func NewHourlyLog(url, db, collection string) (*HourlyLog, error) {
-	log.Debug("Connecting to MongoDB (%s)", url)
+	log.Debug(fmt.Sprintf("Connecting to MongoDB (%s)", url))
 	session, err := mgo.Dial(url)
 	if err != nil {
 		log.Error("Error connecting to MongoDB")
