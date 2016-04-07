@@ -9,10 +9,16 @@ import (
 	"github.com/exekias/metric-collector/constants"
 	"github.com/exekias/metric-collector/logging"
 	"github.com/exekias/metric-collector/queue"
+	"github.com/exekias/metric-collector/util"
 )
 
-// RabbitMQ server URL
-const RabbitMQURL = "amqp://guest:guest@localhost:5672/"
+const (
+	// MaxRetries when sending messages to a queue
+	MaxRetries = 3
+
+	// RabbitMQURL server URL
+	RabbitMQURL = "amqp://guest:guest@localhost:5672/"
+)
 
 var log = logging.MustGetLogger("dispatcher")
 
@@ -31,10 +37,12 @@ func main() {
 	}
 
 	// Init queues
+	log.Debug("Declaring exchange '%s'", constants.Exchange)
 	if err := ch.DeclareExchange(constants.Exchange, true); err != nil {
 		log.Fatal("Could not declare queue exchange: ", err)
 	}
 	for _, queue := range constants.Queues {
+		log.Debug("Declaring queue '%s'", queue)
 		if err := ch.DeclareQueue(constants.Exchange, queue, true); err != nil {
 			log.Fatal("Could not declare queue: ", err)
 		}
@@ -47,8 +55,20 @@ func main() {
 		data.Username = random(usernames)
 		data.Count = rand.Int63()
 		data.Metric = random(metrics)
-		if err := ch.PublishMetric(constants.Exchange, &data); err != nil {
-			log.Warning("Could not publish a message")
+		retries := 0
+		backoff := util.ExponentialBackoff(300 * time.Millisecond)
+		for retries < MaxRetries {
+			if err := ch.PublishMetric(constants.Exchange, &data); err != nil {
+				log.Warning("Could not publish message, retrying (%d)", retries)
+				retries++
+				backoff()
+			} else {
+				break // Everything ok
+			}
+		}
+
+		if retries >= MaxRetries {
+			log.Fatal("Error delivering a message, dying")
 		}
 	}
 }
