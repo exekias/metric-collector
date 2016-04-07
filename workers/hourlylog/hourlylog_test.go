@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 func TestHourlyLog(t *testing.T) {
 	session := server.Session()
 	defer session.Close()
-	processor, err := NewHourlyLog(session, "test", "test")
+	processor, err := initHourlyLog(session, "test", "test")
 	if err != nil {
 		t.Error(err)
 	}
