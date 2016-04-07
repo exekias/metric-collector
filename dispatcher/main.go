@@ -18,6 +18,9 @@ const (
 
 	// RabbitMQURL server URL
 	RabbitMQURL = "amqp://guest:guest@localhost:5672/"
+
+	// RateLimit sent messages to ~10/second
+	RateLimit = time.Second / 10
 )
 
 var log = logging.MustGetLogger("dispatcher")
@@ -51,10 +54,15 @@ func main() {
 	// Send random metrics, forever
 	log.Info("Initialization done, sending random messages")
 	var data queue.MetricData
-	for {
+	for range time.Tick(RateLimit) {
+
+		// Generate random data
 		data.Username = random(usernames)
 		data.Count = rand.Int63()
 		data.Metric = random(metrics)
+		log.Debug("Sending %#v", data)
+
+		// Send it
 		retries := 0
 		backoff := util.ExponentialBackoff(300 * time.Millisecond)
 		for retries < MaxRetries {
