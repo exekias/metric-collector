@@ -8,6 +8,7 @@ import (
 	"github.com/exekias/metric-collector/constants"
 	"github.com/exekias/metric-collector/logging"
 	"github.com/exekias/metric-collector/queue"
+	"github.com/exekias/metric-collector/util"
 	"github.com/exekias/metric-collector/workers"
 	"github.com/exekias/metric-collector/workers/hourlylog"
 )
@@ -16,16 +17,17 @@ var log = logging.MustGetLogger("main")
 var debug = flag.Bool("debug", false, "Enable debug")
 
 const (
-	// MongoURL to connect to
-	MongoURL = "localhost:27017"
 	// MongoDatabase to use
 	MongoDatabase = "metrics"
 	// MongoCollection to use
 	MongoCollection = "hourly"
-
-	// RabbitMQURL server URL
-	RabbitMQURL = "amqp://guest:guest@localhost:5672/"
 )
+
+// MongoURL to connect to
+var MongoURL = util.Getenv("MONGO_URL", "localhost:27017")
+
+// RabbitMQURL server URL
+var RabbitMQURL = util.Getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
 
 func init() {
 	flag.Usage = func() {

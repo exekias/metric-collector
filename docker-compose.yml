@@ -1,3 +1,16 @@
+# Workers
+hourlylog:
+  build: .
+  restart: always
+  command: app -debug hourlylog
+  environment:
+    - MONGO_URL=mongo:27017
+    - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+  links:
+    - mongo:mongo
+    - rabbitmq:rabbitmq
+
+# Backends
 redis:
   image: redis
   ports:
