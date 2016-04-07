@@ -58,7 +58,7 @@ func main() {
 
 		// Generate random data
 		data.Username = random(usernames)
-		data.Count = rand.Int63()
+		data.Count = rand.Int63n(10000)
 		data.Metric = random(metrics)
 		log.Debug("Sending %#v", data)
 
