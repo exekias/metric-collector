@@ -3,16 +3,18 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"time"
 
 	"github.com/exekias/metric-collector/constants"
+	"github.com/exekias/metric-collector/logging"
 	"github.com/exekias/metric-collector/queue"
 )
 
 // RabbitMQ server URL
 const RabbitMQURL = "amqp://guest:guest@localhost:5672/"
+
+var log = logging.MustGetLogger("dispatcher")
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -22,25 +24,32 @@ func main() {
 	var ch queue.Channel
 
 	// Connect to RabbitMQ
+	log.Info("Connecting to RabbitMQ...")
 	ch, err := queue.RabbitMQ(RabbitMQURL)
 	if err != nil {
 		log.Fatal("Error connecting to RabbitMQ: ", err)
 	}
 
 	// Init queues
-	err = ch.DeclareExchange(constants.Exchange, true)
+	if err := ch.DeclareExchange(constants.Exchange, true); err != nil {
+		log.Fatal("Could not declare queue exchange: ", err)
+	}
 	for _, queue := range constants.Queues {
-		err = ch.DeclareQueue(constants.Exchange, queue, true)
+		if err := ch.DeclareQueue(constants.Exchange, queue, true); err != nil {
+			log.Fatal("Could not declare queue: ", err)
+		}
 	}
 
 	// Send random metrics, forever
-
+	log.Info("Initialization done, sending random messages")
 	var data queue.MetricData
 	for {
 		data.Username = random(usernames)
 		data.Count = rand.Int63()
 		data.Metric = random(metrics)
-		err = ch.PublishMetric(constants.Exchange, &data)
+		if err := ch.PublishMetric(constants.Exchange, &data); err != nil {
+			log.Warning("Could not publish a message")
+		}
 	}
 }
 
