@@ -24,8 +24,15 @@ type mongoMetric struct {
 }
 
 // NewHourlyLog intializes and returns a new hourly log processor
-func NewHourlyLog(session *mgo.Session, db, collection string) (*HourlyLog, error) {
+func NewHourlyLog(url, db, collection string) (*HourlyLog, error) {
 	var processor HourlyLog
+
+	log.Debug("Connecting to MongoDB (%s)", url)
+	session, err := mgo.Dial(url)
+	if err != nil {
+		log.Error("Error connecting to MongoDB")
+		return nil, err
+	}
 
 	processor.collection = session.DB(db).C(collection)
 

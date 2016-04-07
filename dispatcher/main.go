@@ -33,7 +33,7 @@ func main() {
 	var ch queue.Channel
 
 	// Connect to RabbitMQ
-	log.Info("Connecting to RabbitMQ...")
+	log.Info("Connecting to RabbitMQ")
 	ch, err := queue.RabbitMQ(RabbitMQURL)
 	if err != nil {
 		log.Fatal("Error connecting to RabbitMQ: ", err)
