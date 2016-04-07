@@ -14,3 +14,8 @@ func init() {
 func MustGetLogger(module string) *glogging.Logger {
 	return glogging.MustGetLogger(module)
 }
+
+// SetLevel for logging
+func SetLevel(level glogging.Level, module string) {
+	glogging.SetLevel(level, module)
+}
