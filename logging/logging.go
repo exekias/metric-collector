@@ -8,7 +8,7 @@ const (
 )
 
 var format = glogging.MustStringFormatter(
-	`%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`,
+	`%{color}%{shortfunc} - %{level:5s} %{id:03x}%{color:reset} %{message}`,
 )
 
 func init() {
