@@ -1,6 +1,8 @@
 package workers
 
 import (
+	"fmt"
+
 	"github.com/exekias/metric-collector/logging"
 	"github.com/exekias/metric-collector/queue"
 )
@@ -25,7 +27,7 @@ func RunWorker(channel queue.Channel, q string, processor MetricDataProcessor) {
 			if err != nil {
 				log.Error("Unexpected error reading metric data:", err)
 			}
-			log.Debug("Processing metric", data)
+			log.Debug(fmt.Sprintf("Processing metric %#v", data))
 			if err := processor.Process(data); err == nil {
 				// We are done
 				m.Ack()

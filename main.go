@@ -10,6 +10,7 @@ import (
 	"github.com/exekias/metric-collector/queue"
 	"github.com/exekias/metric-collector/util"
 	"github.com/exekias/metric-collector/workers"
+	"github.com/exekias/metric-collector/workers/distinctname"
 	"github.com/exekias/metric-collector/workers/hourlylog"
 )
 
@@ -29,12 +30,16 @@ var MongoURL = util.Getenv("MONGO_URL", "localhost:27017")
 // RabbitMQURL server URL
 var RabbitMQURL = util.Getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
 
+// RedisURL server URL
+var RedisURL = util.Getenv("REDIS_URL", "localhost:6379")
+
 func init() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		flag.PrintDefaults()
 		fmt.Fprintln(os.Stderr, "Args:")
 		fmt.Fprintln(os.Stderr, "  -hourlylog - runs hourly log worker")
+		fmt.Fprintln(os.Stderr, "  -distinctname - runs distinct name worker")
 	}
 }
 
@@ -70,6 +75,10 @@ func initProcessor(name string) (workers.MetricDataProcessor, string) {
 	case "hourlylog":
 		processor, err = hourlylog.NewHourlyLog(MongoURL, MongoDatabase, MongoCollection)
 		queue = constants.HourlyLog
+
+	case "distinctname":
+		processor, err = distinctname.NewDistinctName(RedisURL)
+		queue = constants.DistinctName
 
 	default:
 		fmt.Printf("Unkown processor '%s'\n\n", name)

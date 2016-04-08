@@ -9,6 +9,16 @@ hourlylog:
   links:
     - mongo:mongo
     - rabbitmq:rabbitmq
+distinctname:
+  build: .
+  restart: always
+  command: app -debug distinctname
+  environment:
+    - REDIS_URL=redis:6379
+    - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+  links:
+    - redis:redis
+    - rabbitmq:rabbitmq
 
 # Backends
 redis:
