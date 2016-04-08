@@ -19,6 +19,16 @@ distinctname:
   links:
     - redis:redis
     - rabbitmq:rabbitmq
+accountname:
+  build: .
+  restart: always
+  command: app -debug accountname
+  environment:
+    - POSTGRES_URL=postgres://metrics:foobar@postgres/metrics?sslmode=disable
+    - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+  links:
+    - postgres:postgres
+    - rabbitmq:rabbitmq
 
 # Backends
 redis:
@@ -43,3 +53,4 @@ postgres:
   environment:
     - POSTGRES_USER=metrics
     - POSTGRES_PASSWORD=foobar
+    - POSTGRES_DB=metrics

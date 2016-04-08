@@ -10,6 +10,7 @@ import (
 	"github.com/exekias/metric-collector/queue"
 	"github.com/exekias/metric-collector/util"
 	"github.com/exekias/metric-collector/workers"
+	"github.com/exekias/metric-collector/workers/accountname"
 	"github.com/exekias/metric-collector/workers/distinctname"
 	"github.com/exekias/metric-collector/workers/hourlylog"
 )
@@ -33,6 +34,9 @@ var RabbitMQURL = util.Getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672
 // RedisURL server URL
 var RedisURL = util.Getenv("REDIS_URL", "localhost:6379")
 
+// PostgresURL server URL
+var PostgresURL = util.Getenv("POSTGRES_URL", "postgres://metrics:foobar@localhost/metrics?sslmode=disable")
+
 func init() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
@@ -40,6 +44,7 @@ func init() {
 		fmt.Fprintln(os.Stderr, "Args:")
 		fmt.Fprintln(os.Stderr, "  -hourlylog - runs hourly log worker")
 		fmt.Fprintln(os.Stderr, "  -distinctname - runs distinct name worker")
+		fmt.Fprintln(os.Stderr, "  -accountname - runs account name worker")
 	}
 }
 
@@ -79,6 +84,10 @@ func initProcessor(name string) (workers.MetricDataProcessor, string) {
 	case "distinctname":
 		processor, err = distinctname.NewDistinctName(RedisURL)
 		queue = constants.DistinctName
+
+	case "accountname":
+		processor, err = accountname.NewAccountName(PostgresURL)
+		queue = constants.AccountName
 
 	default:
 		fmt.Printf("Unkown processor '%s'\n\n", name)

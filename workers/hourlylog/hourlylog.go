@@ -32,7 +32,6 @@ func NewHourlyLog(url, db, collection string) (*HourlyLog, error) {
 		log.Error("Error connecting to MongoDB")
 		return nil, err
 	}
-
 	return initHourlyLog(session, db, collection)
 }
 
