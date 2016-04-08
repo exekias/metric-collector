@@ -61,7 +61,7 @@ func (p DistinctName) insert(t time.Time, d *queue.MetricData) error {
 // purposes)
 // It would be enough to run it after changing month or on a monthly basis
 func (p DistinctName) runConsolidate() {
-	for range time.Tick(10 * time.Second) {
+	for range time.Tick(10 * time.Minute) {
 		p.monthlyConsolidate()
 	}
 }
