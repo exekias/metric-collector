@@ -158,3 +158,8 @@ func (m *RabbitMQMetricMessage) MetricData() (MetricData, error) {
 func (m *RabbitMQMetricMessage) Ack() error {
 	return m.d.Ack(false)
 }
+
+// Nack negatively acknowledges the message, forcing requeuing
+func (m *RabbitMQMetricMessage) Nack() error {
+	return m.d.Nack(false, true)
+}

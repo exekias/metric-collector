@@ -83,3 +83,8 @@ func (m *DummyMetricMessage) Ack() error {
 	m.Acked = true
 	return nil
 }
+
+// Nack negatively acknowledges the message, forcing requeuing
+func (m *DummyMetricMessage) Nack() error {
+	return nil
+}

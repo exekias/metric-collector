@@ -32,6 +32,7 @@ func RunWorker(channel queue.Channel, q string, processor MetricDataProcessor) {
 				// We are done
 				m.Ack()
 			} else {
+				m.Nack()
 				log.Warning("Error while processing a metric, won't ACK:", err)
 			}
 		}(metric)

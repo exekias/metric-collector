@@ -33,4 +33,7 @@ type MetricMessage interface {
 
 	// Ack acknowledges metric processed (and stored) correctly
 	Ack() error
+
+	// Nack negatively acknowledges the message, forcing requeuing
+	Nack() error
 }
