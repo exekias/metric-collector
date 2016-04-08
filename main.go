@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/exekias/metric-collector/constants"
@@ -67,8 +68,13 @@ func main() {
 	log.Info(fmt.Sprintf("Initializing queue consumer %s", flag.Arg(0)))
 	channel := initConsumer()
 
+	log.Info("Serving stats in http://localhost:8080/debug/vars")
+	go func() {
+		http.ListenAndServe(":8080", nil)
+	}()
+
 	log.Info("Starting worker")
-	workers.RunWorker(channel, queue, processor)
+	workers.RunWorker(channel, queue, workers.Stats(processor, true))
 	os.Exit(1)
 }
 
