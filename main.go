@@ -69,6 +69,7 @@ func main() {
 
 	log.Info("Starting worker")
 	workers.RunWorker(channel, queue, processor)
+	os.Exit(1)
 }
 
 func initProcessor(name string) (workers.MetricDataProcessor, string) {

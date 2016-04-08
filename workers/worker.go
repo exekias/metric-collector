@@ -18,11 +18,19 @@ func RunWorker(channel queue.Channel, q string, processor MetricDataProcessor) {
 		log.Fatal("Could not consume from queue", err)
 	}
 
+	// Results channel, true = success, false = error
+	results := make(chan bool)
+
+	// Will get true when too many errors happened
+	tooManyErrors := make(chan bool)
+
+	go errorCheck(results, tooManyErrors)
+
 	// Listen and process all metrics
 	for metric := range metrics {
 		// Process in a goroutine, channel QoS will handle throttling,
 		// see queue/rabbitmq.go:ConsumeMetrics
-		go func(m queue.MetricMessage) {
+		go func(m queue.MetricMessage, results chan<- bool) {
 			data, err := m.MetricData()
 			if err != nil {
 				log.Error("Unexpected error reading metric data:", err)
@@ -31,11 +39,36 @@ func RunWorker(channel queue.Channel, q string, processor MetricDataProcessor) {
 			if err := processor.Process(data); err == nil {
 				// We are done
 				m.Ack()
+				results <- true
 			} else {
-				m.Nack()
 				log.Warning("Error while processing a metric, won't ACK:", err)
+				m.Nack()
+				results <- false
 			}
-		}(metric)
+		}(metric, results)
+
+		select {
+		case <-tooManyErrors:
+			log.Error("Processor had too many errors, quitting...")
+			return
+		default:
+		}
 	}
 	log.Error("Disconnected from metrics queue")
+}
+
+// errorCheck notifies of too many errors after 5 errors in a row
+func errorCheck(results <-chan bool, tooManyErrors chan<- bool) {
+	errors := 0
+	for success := range results {
+		if success {
+			errors = 0
+		} else {
+			errors++
+		}
+
+		if errors >= 5 {
+			tooManyErrors <- true
+		}
+	}
 }
